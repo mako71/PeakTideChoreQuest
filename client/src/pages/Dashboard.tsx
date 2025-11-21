@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Navigation } from "@/components/layout/Navigation";
 import { AddQuestDialog } from "@/components/settings/AddQuestDialog";
-import { Leaderboard } from "@/components/dashboard/Leaderboard";
+import { QuestBoard } from "@/components/dashboard/QuestBoard";
 import { TaskCard } from "@/components/dashboard/TaskCard";
+import { Leaderboard } from "@/components/dashboard/Leaderboard";
 import { motion } from "framer-motion";
 import { Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const [filter, setFilter] = useState<'all' | 'mountain' | 'ocean'>('all');
+  const [showBoard, setShowBoard] = useState(true);
   const { tasks, completeQuest, claimQuest, addQuest, updateQuest, deleteQuest } = useQuests();
   const { toast } = useToast();
 
@@ -91,50 +93,80 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Quest Board */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-4">
                 <h3 className="text-xl font-display font-bold">Active Quests</h3>
-                <div className="flex gap-2 bg-card border p-1 rounded-lg">
-                   <Button 
-                    variant={filter === 'all' ? 'secondary' : 'ghost'} 
-                    size="sm" 
-                    onClick={() => setFilter('all')}
-                    className="h-7 text-xs"
-                   >
-                     All
-                   </Button>
-                   <Button 
-                    variant={filter === 'mountain' ? 'secondary' : 'ghost'} 
-                    size="sm" 
-                    onClick={() => setFilter('mountain')}
-                    className="h-7 text-xs gap-1"
-                   >
-                     <div className="w-2 h-2 rounded-full bg-primary" />
-                     Land
-                   </Button>
-                   <Button 
-                    variant={filter === 'ocean' ? 'secondary' : 'ghost'} 
-                    size="sm" 
-                    onClick={() => setFilter('ocean')}
-                    className="h-7 text-xs gap-1"
-                   >
-                     <div className="w-2 h-2 rounded-full bg-secondary" />
-                     Sea
-                   </Button>
+                <div className="flex gap-2 flex-wrap">
+                  <div className="flex gap-2 bg-card border p-1 rounded-lg">
+                    <Button 
+                      variant={showBoard ? 'secondary' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => setShowBoard(true)}
+                      className="h-7 text-xs"
+                    >
+                      📋 Board
+                    </Button>
+                    <Button 
+                      variant={!showBoard ? 'secondary' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => setShowBoard(false)}
+                      className="h-7 text-xs"
+                    >
+                      📝 List
+                    </Button>
+                  </div>
+                  <div className="flex gap-2 bg-card border p-1 rounded-lg">
+                    <Button 
+                      variant={filter === 'all' ? 'secondary' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => setFilter('all')}
+                      className="h-7 text-xs"
+                    >
+                      All
+                    </Button>
+                    <Button 
+                      variant={filter === 'mountain' ? 'secondary' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => setFilter('mountain')}
+                      className="h-7 text-xs gap-1"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      Land
+                    </Button>
+                    <Button 
+                      variant={filter === 'ocean' ? 'secondary' : 'ghost'} 
+                      size="sm" 
+                      onClick={() => setFilter('ocean')}
+                      className="h-7 text-xs gap-1"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-secondary" />
+                      Sea
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                {filteredTasks.map((task) => (
-                  <TaskCard 
-                    key={task.id} 
-                    task={task} 
-                    onComplete={handleComplete}
-                    onClaim={handleClaim}
-                    onEdit={handleEditQuest}
-                    onDelete={handleDeleteQuest}
-                  />
-                ))}
-              </div>
+              {showBoard ? (
+                <QuestBoard 
+                  quests={filteredTasks}
+                  onComplete={handleComplete}
+                  onClaim={handleClaim}
+                  onEdit={handleEditQuest}
+                  onDelete={handleDeleteQuest}
+                />
+              ) : (
+                <div className="space-y-4">
+                  {filteredTasks.map((task) => (
+                    <TaskCard 
+                      key={task.id} 
+                      task={task} 
+                      onComplete={handleComplete}
+                      onClaim={handleClaim}
+                      onEdit={handleEditQuest}
+                      onDelete={handleDeleteQuest}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Sidebar Widgets */}
