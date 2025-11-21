@@ -8,9 +8,10 @@ interface QuestBoardProps {
   onClaim: (id: number) => void;
   onEdit: (updatedQuest: any) => void;
   onDelete: (id: number) => void;
+  dashboardMode?: boolean;
 }
 
-export function QuestBoard({ quests, onComplete, onClaim, onEdit, onDelete }: QuestBoardProps) {
+export function QuestBoard({ quests, onComplete, onClaim, onEdit, onDelete, dashboardMode }: QuestBoardProps) {
   const columns = [
     { status: "open", label: "Available", icon: "✨", color: "bg-blue-500/10 border-blue-500/20" },
     { status: "in-progress", label: "In Progress", icon: "⚔️", color: "bg-amber-500/10 border-amber-500/20" },
@@ -59,34 +60,57 @@ export function QuestBoard({ quests, onComplete, onClaim, onEdit, onDelete }: Qu
                         </div>
 
                         <div className="flex gap-2">
-                          {quest.status === "open" && (
-                            <button
-                              onClick={() => onClaim(quest.id)}
-                              className="flex-1 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-1.5 rounded transition-colors"
-                            >
-                              Accept
-                            </button>
+                          {dashboardMode ? (
+                            <>
+                              {quest.status === "open" && (
+                                <button
+                                  onClick={() => onClaim(quest.id)}
+                                  className="flex-1 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-1.5 rounded transition-colors"
+                                >
+                                  Accept
+                                </button>
+                              )}
+                              {quest.status !== "open" && (
+                                <button
+                                  disabled
+                                  className="flex-1 text-xs bg-muted text-muted-foreground font-bold py-1.5 rounded opacity-50 cursor-not-allowed"
+                                >
+                                  {quest.status === "in-progress" ? "In Progress" : "Completed"}
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              {quest.status === "open" && (
+                                <button
+                                  onClick={() => onClaim(quest.id)}
+                                  className="flex-1 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-1.5 rounded transition-colors"
+                                >
+                                  Accept
+                                </button>
+                              )}
+                              {quest.status === "in-progress" && (
+                                <button
+                                  onClick={() => onComplete(quest.id)}
+                                  className="flex-1 text-xs bg-accent hover:bg-accent/90 text-white font-bold py-1.5 rounded transition-colors"
+                                >
+                                  Complete
+                                </button>
+                              )}
+                              <button
+                                onClick={() => onEdit(quest)}
+                                className="flex-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground font-bold py-1.5 rounded transition-colors"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => onDelete(quest.id)}
+                                className="text-xs bg-destructive/10 hover:bg-destructive/20 text-destructive font-bold px-3 py-1.5 rounded transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </>
                           )}
-                          {quest.status === "in-progress" && (
-                            <button
-                              onClick={() => onComplete(quest.id)}
-                              className="flex-1 text-xs bg-accent hover:bg-accent/90 text-white font-bold py-1.5 rounded transition-colors"
-                            >
-                              Complete
-                            </button>
-                          )}
-                          <button
-                            onClick={() => onEdit(quest)}
-                            className="flex-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground font-bold py-1.5 rounded transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => onDelete(quest.id)}
-                            className="text-xs bg-destructive/10 hover:bg-destructive/20 text-destructive font-bold px-3 py-1.5 rounded transition-colors"
-                          >
-                            Delete
-                          </button>
                         </div>
                       </div>
                     ))

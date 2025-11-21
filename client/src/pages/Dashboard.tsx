@@ -152,6 +152,7 @@ export default function Dashboard() {
                   onClaim={handleClaim}
                   onEdit={handleEditQuest}
                   onDelete={handleDeleteQuest}
+                  dashboardMode={true}
                 />
               ) : (
                 <div className="space-y-4">
@@ -163,6 +164,7 @@ export default function Dashboard() {
                       onClaim={handleClaim}
                       onEdit={handleEditQuest}
                       onDelete={handleDeleteQuest}
+                      dashboardMode={true}
                     />
                   ))}
                 </div>

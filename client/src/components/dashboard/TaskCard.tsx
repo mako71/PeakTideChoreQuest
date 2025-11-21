@@ -15,9 +15,10 @@ interface TaskCardProps {
   onClaim?: (id: number) => void;
   onEdit?: (updatedQuest: any) => void;
   onDelete?: (id: number) => void;
+  dashboardMode?: boolean;
 }
 
-export function TaskCard({ task, onComplete, onClaim, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onComplete, onClaim, onEdit, onDelete, dashboardMode }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
@@ -128,6 +129,29 @@ export function TaskCard({ task, onComplete, onClaim, onEdit, onDelete }: TaskCa
                <CheckCircle2 className="w-4 h-4 mr-2" />
                Mission Complete
              </Button>
+           ) : dashboardMode ? (
+             <>
+               {task.steps.length > 0 ? (
+                 <Button 
+                   variant="outline" 
+                   size="sm" 
+                   className="w-full justify-between group-hover:bg-accent/5"
+                   onClick={() => setIsExpanded(!isExpanded)}
+                 >
+                   <span>{isExpanded ? "Hide Steps" : "View Steps"}</span>
+                   {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                 </Button>
+              ) : (
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="w-full font-tech"
+                  disabled={task.assignee}
+                >
+                  {task.assignee ? "Already Accepted" : "Accept Quest"}
+                </Button>
+              )}
+             </>
            ) : (
              <>
               {task.steps.length > 0 ? (
