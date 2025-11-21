@@ -127,15 +127,15 @@ Let's complete quests together and compete on the leaderboard! 🏔️🌊`;
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl">Invite to Household</DialogTitle>
+          <DialogTitle className="text-xl">Add to Household</DialogTitle>
           <DialogDescription>
             Bring your crew together for an epic expedition. Choose your method.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="invite" className="w-full py-4">
+        <Tabs defaultValue="add" className="w-full py-4">
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="invite">Invite</TabsTrigger>
+            <TabsTrigger value="invite">Invite Link</TabsTrigger>
             <TabsTrigger value="add">Add Member</TabsTrigger>
           </TabsList>
 
