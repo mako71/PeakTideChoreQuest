@@ -119,9 +119,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      const parsedData = insertMemberSchema.parse(req.body);
       const member = await storage.addMember({
         householdId: req.params.id,
-        ...insertMemberSchema.parse(req.body),
+        userId: parsedData.userId,
+        name: parsedData.name,
+        avatar: parsedData.avatar,
+        title: parsedData.title,
+        role: parsedData.role,
       });
       res.json(member);
     } catch (error) {
@@ -162,9 +167,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      const parsedData = insertQuestSchema.parse(req.body);
       const quest = await storage.createQuest({
         householdId: req.params.id,
-        ...insertQuestSchema.parse(req.body),
+        title: parsedData.title,
+        description: parsedData.description,
+        xp: parsedData.xp,
+        difficulty: parsedData.difficulty,
+        type: parsedData.type,
+        status: parsedData.status,
+        assigneeId: parsedData.assigneeId,
+        steps: parsedData.steps,
       });
       res.json(quest);
     } catch (error) {
