@@ -23,6 +23,7 @@ const PgSession = createPgSimpleStore(session);
 app.use(session({
   store: new PgSession({
     conString: process.env.DATABASE_URL,
+    createTableIfMissing: true,
   }),
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
   resave: false,
