@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { applyTheme, getSavedTheme } from "./themes";
 
 interface AppContextType {
   darkMode: boolean;
@@ -17,7 +18,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [selectedTheme, setSelectedTheme] = useState("forest");
+  const [selectedTheme, setSelectedTheme] = useState(() => getSavedTheme());
+
+  useEffect(() => {
+    applyTheme(selectedTheme);
+  }, [selectedTheme]);
 
   const value = {
     darkMode,
