@@ -30,13 +30,19 @@ export default function SetupHousehold() {
         throw new Error("Failed to create household");
       }
 
+      // Refresh user data to get updated householdId
+      await fetch("/api/auth/me");
+
       toast({
         title: "Household Created! 🏠",
         description: `${householdName} is ready for your expedition.`,
         className: "bg-primary text-primary-foreground border-none",
       });
 
-      navigate("/");
+      // Give auth context time to update
+      setTimeout(() => {
+        navigate("/");
+      }, 100);
     } catch (error) {
       toast({
         title: "Error",
