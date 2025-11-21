@@ -145,9 +145,9 @@ export default function Profile() {
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { label: "Quests Completed", value: "42", icon: "✅" },
-                      { label: "Current Streak", value: `${CURRENT_USER.streak} days`, icon: "🔥" },
+                      { label: "Current Streak", value: `${CURRENT_USER.streak || 0} days`, icon: "🔥" },
                       { label: "Total Badges", value: "8", icon: "🏅" },
-                      { label: "Rank", value: `#${CURRENT_USER.rank}`, icon: "👑" },
+                      { label: "Rank", value: `#${rank}`, icon: "👑" },
                     ].map((stat, i) => (
                       <div key={i} className="p-4 bg-muted/30 rounded-lg border border-border">
                         <p className="text-2xl font-bold mb-1">{stat.value}</p>
