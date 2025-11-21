@@ -5,6 +5,7 @@ import { useQuests } from "./quests-context";
 interface MembersContextType {
   members: any[];
   removeMember: (userId: number) => void;
+  addMember: (member: any) => void;
 }
 
 const MembersContext = createContext<MembersContextType | undefined>(undefined);
@@ -24,9 +25,22 @@ export function MembersProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const addMember = (member: any) => {
+    const newMember = {
+      ...member,
+      id: Math.max(...members.map(m => m.id), 0) + 1,
+      xp: member.xp || 0,
+      level: member.level || 1,
+      rank: members.length + 1,
+      streak: member.streak || 0,
+    };
+    setMembers([...members, newMember]);
+  };
+
   const value = {
     members,
     removeMember,
+    addMember,
   };
 
   return (

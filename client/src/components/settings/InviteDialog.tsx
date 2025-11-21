@@ -1,17 +1,23 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Copy, Mail, MessageCircle, Share2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Copy, Mail, MessageCircle, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMembers } from "@/lib/members-context";
 
 export function InviteDialog() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [copied, setCopied] = useState(false);
+  const [memberName, setMemberName] = useState("");
+  const [memberTitle, setMemberTitle] = useState("");
+  const [memberAvatar, setMemberAvatar] = useState("");
   const { toast } = useToast();
+  const { addMember } = useMembers();
 
   const inviteLink = "https://basecamp.household/invite/xyz123abc456";
 
@@ -85,6 +91,33 @@ Let's complete quests together and compete on the leaderboard! 🏔️🌊`;
     setOpen(false);
   };
 
+  const handleAddMemberManually = () => {
+    if (!memberName.trim()) {
+      toast({
+        title: "Name Required",
+        description: "Please enter a member name",
+      });
+      return;
+    }
+
+    addMember({
+      name: memberName,
+      title: memberTitle || "Adventurer",
+      avatar: memberAvatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100",
+    });
+
+    toast({
+      title: "Member Added! 🎉",
+      description: `${memberName} has joined your household expedition.`,
+      className: "bg-primary text-primary-foreground border-none",
+    });
+
+    setMemberName("");
+    setMemberTitle("");
+    setMemberAvatar("");
+    setOpen(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -100,7 +133,13 @@ Let's complete quests together and compete on the leaderboard! 🏔️🌊`;
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <Tabs defaultValue="invite" className="w-full py-4">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="invite">Invite</TabsTrigger>
+            <TabsTrigger value="add">Add Member</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="invite" className="space-y-6">
           {/* Copy Link Section */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Share Link</Label>
@@ -176,7 +215,60 @@ Let's complete quests together and compete on the leaderboard! 🏔️🌊`;
               Send Text
             </Button>
           </div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="add" className="space-y-4">
+            <div className="space-y-3">
+              <Label htmlFor="member-name" className="text-sm font-medium">
+                Member Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="member-name"
+                placeholder="e.g., Casey"
+                value={memberName}
+                onChange={(e) => setMemberName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddMemberManually()}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="member-title" className="text-sm font-medium">
+                Title (Optional)
+              </Label>
+              <Input
+                id="member-title"
+                placeholder="e.g., Peak Conqueror"
+                value={memberTitle}
+                onChange={(e) => setMemberTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="member-avatar" className="text-sm font-medium">
+                Avatar URL (Optional)
+              </Label>
+              <Input
+                id="member-avatar"
+                placeholder="https://example.com/avatar.jpg"
+                value={memberAvatar}
+                onChange={(e) => setMemberAvatar(e.target.value)}
+              />
+              {memberAvatar && (
+                <div className="mt-2">
+                  <img src={memberAvatar} alt="Avatar preview" className="w-16 h-16 rounded-full object-cover" />
+                </div>
+              )}
+            </div>
+
+            <Button
+              onClick={handleAddMemberManually}
+              className="w-full bg-accent hover:bg-accent/90 text-white font-semibold mt-4"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Add Member
+            </Button>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
