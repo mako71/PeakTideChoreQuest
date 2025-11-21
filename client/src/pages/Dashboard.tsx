@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuests } from "@/lib/quests-context";
+import { useMembers } from "@/lib/members-context";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 import heroImage from "@assets/generated_images/adventure_enthusiasts_hero_image.png";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +17,8 @@ export default function Dashboard() {
   const [filter, setFilter] = useState<'all' | 'mountain' | 'ocean'>('all');
   const [showBoard, setShowBoard] = useState(true);
   const { tasks, completeQuest, claimQuest, addQuest, updateQuest, deleteQuest } = useQuests();
+  const { members } = useMembers();
+  const currentUser = members[0] || { name: "Ranger", title: "Adventurer" };
   const { toast } = useToast();
 
   const filteredTasks = tasks.filter(t => filter === 'all' || t.type === filter);
@@ -81,7 +84,7 @@ export default function Dashboard() {
                 Daily Briefing
               </div>
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                Morning, Ranger.
+                Morning, {currentUser.name}.
               </h2>
               <p className="text-sidebar-foreground/80 leading-relaxed">
                 The dish mountain is growing, but the laundry seas are calm. 
