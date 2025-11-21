@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navigation } from "@/components/layout/Navigation";
 import { InviteDialog } from "@/components/settings/InviteDialog";
 import { USERS } from "@/lib/data";
@@ -13,8 +14,18 @@ import { Separator } from "@/components/ui/separator";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
 export default function SettingsPage() {
+  const [householdMembers, setHouseholdMembers] = useState(USERS);
   const { notifications, setNotifications, darkMode, setDarkMode, soundEnabled, setSoundEnabled, selectedTheme, setSelectedTheme } = useAppSettings();
   const { toast } = useToast();
+
+  const handleRemoveMember = (userId: number, userName: string) => {
+    setHouseholdMembers(householdMembers.filter(user => user.id !== userId));
+    toast({
+      title: "Member Removed",
+      description: `${userName} has been removed from the household.`,
+      className: "bg-destructive text-destructive-foreground border-none",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
@@ -165,8 +176,8 @@ export default function SettingsPage() {
                   <CardDescription>Manage your expedition crew</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {USERS.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                  {householdMembers.map((user) => (
+                    <div key={user.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg animate-in fade-in slide-in-from-right-2">
                       <div className="flex items-center gap-3">
                         <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
                         <div>
@@ -177,10 +188,8 @@ export default function SettingsPage() {
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        onClick={() => toast({
-                          title: "Member removed",
-                          description: `${user.name} has been removed from the household.`,
-                        })}
+                        className="hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => handleRemoveMember(user.id, user.name)}
                       >
                         Remove
                       </Button>
@@ -241,7 +250,7 @@ export default function SettingsPage() {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Members</span>
-                    <span className="font-bold">{USERS.length}</span>
+                    <span className="font-bold">{householdMembers.length}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-sm">
