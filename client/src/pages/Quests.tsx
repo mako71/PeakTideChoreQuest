@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navigation } from "@/components/layout/Navigation";
+import { AddQuestDialog } from "@/components/settings/AddQuestDialog";
 import { TaskCard } from "@/components/dashboard/TaskCard";
 import { TASKS } from "@/lib/data";
 import { Plus, Search, Filter } from "lucide-react";
@@ -39,6 +40,10 @@ export default function Quests() {
     setTasks(tasks.map(t => t.id === id ? { ...t, assignee: 1 } : t));
   };
 
+  const handleAddQuest = (newQuest: any) => {
+    setTasks([...tasks, newQuest]);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       <Navigation />
@@ -57,10 +62,7 @@ export default function Quests() {
               <h1 className="text-3xl font-display font-bold mb-1">Quest Board</h1>
               <p className="text-muted-foreground text-sm">All household expeditions</p>
             </div>
-            <Button className="bg-accent hover:bg-accent/90 text-white font-bold gap-2">
-              <Plus className="w-4 h-4" />
-              Create Quest
-            </Button>
+            <AddQuestDialog onAddQuest={handleAddQuest} />
           </div>
 
           {/* Filters */}

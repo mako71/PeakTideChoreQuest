@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navigation } from "@/components/layout/Navigation";
+import { AddQuestDialog } from "@/components/settings/AddQuestDialog";
 import { Leaderboard } from "@/components/dashboard/Leaderboard";
 import { TaskCard } from "@/components/dashboard/TaskCard";
 import { TASKS } from "@/lib/data";
@@ -39,6 +40,10 @@ export default function Dashboard() {
         description: `You are now assigned to "${task.title}". Good luck, Ranger.`,
       });
      }
+  };
+
+  const handleAddQuest = (newQuest: any) => {
+    setTasks([...tasks, newQuest]);
   };
 
   return (
@@ -125,6 +130,8 @@ export default function Dashboard() {
 
             {/* Sidebar Widgets */}
             <div className="space-y-6">
+              <AddQuestDialog onAddQuest={handleAddQuest} />
+              
               <Leaderboard />
               
               <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/10">
