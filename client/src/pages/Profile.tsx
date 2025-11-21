@@ -5,12 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useMembers } from "@/lib/members-context";
+import { useAuth } from "@/lib/auth-context";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
 export default function Profile() {
   const { members } = useMembers();
-  // Mock: logged-in user is the first member (Alex)
-  const CURRENT_USER = members[0] || { name: "Ranger", level: 1, xp: 0, rank: 0, streak: 0, title: "Adventurer", avatar: "" };
+  const { user } = useAuth();
+  // Get current user's member profile
+  const CURRENT_USER = members.find(m => m.userId === user?.id) || members[0] || { name: "Ranger", level: 1, xp: 0, streak: 0, title: "Adventurer", avatar: "" };
+  // Calculate rank based on XP
+  const rank = members.filter(m => m.xp > CURRENT_USER.xp).length + 1;
   
   const nextLevelXp = CURRENT_USER.level * 1000;
   const currentLevelXp = (CURRENT_USER.level - 1) * 1000;
@@ -48,12 +52,12 @@ export default function Profile() {
                 <div className="flex gap-6">
                   <div className="flex items-center gap-2">
                     <Trophy className="w-5 h-5" />
-                    <span className="font-tech font-bold text-lg">{CURRENT_USER.rank}</span>
+                    <span className="font-tech font-bold text-lg">#{rank}</span>
                     <span className="text-sm opacity-90">Rank</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Flame className="w-5 h-5 text-orange-300" />
-                    <span className="font-tech font-bold text-lg">{CURRENT_USER.streak}</span>
+                    <span className="font-tech font-bold text-lg">{CURRENT_USER.streak || 0}</span>
                     <span className="text-sm opacity-90">Day Streak</span>
                   </div>
                 </div>
