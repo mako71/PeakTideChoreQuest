@@ -3,7 +3,7 @@ import { InviteDialog } from "@/components/settings/InviteDialog";
 import { useAppSettings } from "@/lib/context";
 import { useMembers } from "@/lib/members-context";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Users, Bell, Palette, Shield, HelpCircle, LogOut } from "lucide-react";
+import { Settings, Users, Bell, Palette, Shield, HelpCircle, LogOut, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
 export default function SettingsPage() {
-  const { members, removeMember } = useMembers();
+  const { members, removeMember, updateMemberRole } = useMembers();
   const { notifications, setNotifications, darkMode, setDarkMode, soundEnabled, setSoundEnabled, selectedTheme, setSelectedTheme } = useAppSettings();
   const { toast } = useToast();
 
@@ -23,6 +23,17 @@ export default function SettingsPage() {
       title: "Member Removed",
       description: `${userName} has been removed from the household.`,
       className: "bg-destructive text-destructive-foreground border-none",
+    });
+  };
+
+  const handleToggleRole = (userId: number, currentRole: string) => {
+    const newRole = currentRole === 'manager' ? 'member' : 'manager';
+    updateMemberRole(userId, newRole as "member" | "manager");
+    const userName = members.find(m => m.id === userId)?.name || "Member";
+    toast({
+      title: newRole === 'manager' ? "Promoted to Manager 👑" : "Demoted to Member",
+      description: `${userName} is now a ${newRole}.`,
+      className: "bg-primary text-primary-foreground border-none",
     });
   };
 
@@ -177,21 +188,36 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                   {members.map((user) => (
                     <div key={user.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg animate-in fade-in slide-in-from-right-2">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1">
                         <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
-                        <div>
-                          <p className="font-medium">{user.name}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{user.name}</p>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${user.role === 'manager' ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'}`}>
+                              {user.role === 'manager' ? '👑 Manager' : 'Member'}
+                            </span>
+                          </div>
                           <p className="text-xs text-muted-foreground">Level {user.level} • {user.xp} XP</p>
                         </div>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => handleRemoveMember(user.id, user.name)}
-                      >
-                        Remove
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-xs"
+                          onClick={() => handleToggleRole(user.id, user.role)}
+                        >
+                          {user.role === 'manager' ? 'Demote' : 'Promote'}
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => handleRemoveMember(user.id, user.name)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
                     </div>
                   ))}
                   

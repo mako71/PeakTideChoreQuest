@@ -16,6 +16,7 @@ export function InviteDialog() {
   const [memberName, setMemberName] = useState("");
   const [memberTitle, setMemberTitle] = useState("");
   const [memberAvatar, setMemberAvatar] = useState("");
+  const [memberRole, setMemberRole] = useState<"member" | "manager">("member");
   const { toast } = useToast();
   const { addMember } = useMembers();
 
@@ -104,17 +105,19 @@ Let's complete quests together and compete on the leaderboard! 🏔️🌊`;
       name: memberName,
       title: memberTitle || "Adventurer",
       avatar: memberAvatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100",
+      role: memberRole,
     });
 
     toast({
       title: "Member Added! 🎉",
-      description: `${memberName} has joined your household expedition.`,
+      description: `${memberName} has joined as a ${memberRole}.`,
       className: "bg-primary text-primary-foreground border-none",
     });
 
     setMemberName("");
     setMemberTitle("");
     setMemberAvatar("");
+    setMemberRole("member");
     setOpen(false);
   };
 
@@ -258,6 +261,22 @@ Let's complete quests together and compete on the leaderboard! 🏔️🌊`;
                   <img src={memberAvatar} alt="Avatar preview" className="w-16 h-16 rounded-full object-cover" />
                 </div>
               )}
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="member-role" className="text-sm font-medium">
+                Role
+              </Label>
+              <select
+                id="member-role"
+                value={memberRole}
+                onChange={(e) => setMemberRole(e.target.value as "member" | "manager")}
+                className="w-full px-3 py-2 border border-border rounded-lg bg-background"
+              >
+                <option value="member">Member (Can complete quests)</option>
+                <option value="manager">Manager (Can create & edit quests)</option>
+              </select>
+              <p className="text-xs text-muted-foreground">Managers can add and edit quests. Members only complete them.</p>
             </div>
 
             <Button

@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMembers } from "@/lib/members-context";
 
 interface AddQuestDialogProps {
   onAddQuest: (quest: any) => void;
@@ -21,6 +22,10 @@ export function AddQuestDialog({ onAddQuest }: AddQuestDialogProps) {
   const [steps, setSteps] = useState<string[]>([]);
   const [stepInput, setStepInput] = useState("");
   const { toast } = useToast();
+  const { members } = useMembers();
+  
+  const currentUser = members[0] || { role: "member" };
+  const isManager = currentUser.role === "manager";
 
   const handleAddStep = () => {
     if (stepInput.trim()) {
@@ -79,6 +84,15 @@ export function AddQuestDialog({ onAddQuest }: AddQuestDialogProps) {
     setStepInput("");
     setOpen(false);
   };
+
+  if (!isManager) {
+    return (
+      <Button disabled className="gap-2 opacity-50 cursor-not-allowed">
+        <Lock className="w-4 h-4" />
+        Manager Only
+      </Button>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -9,7 +9,8 @@ export const USERS = [
     level: 12,
     rank: 1,
     streak: 5,
-    title: "Summit Seeker"
+    title: "Summit Seeker",
+    role: "manager"
   },
   {
     id: 2,
@@ -19,7 +20,8 @@ export const USERS = [
     level: 10,
     rank: 2,
     streak: 12,
-    title: "Wave Rider"
+    title: "Wave Rider",
+    role: "member"
   },
   {
     id: 3,
@@ -29,7 +31,8 @@ export const USERS = [
     level: 8,
     rank: 3,
     streak: 2,
-    title: "Trail Blazer"
+    title: "Trail Blazer",
+    role: "member"
   }
 ];
 

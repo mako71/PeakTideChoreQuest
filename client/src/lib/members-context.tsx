@@ -6,6 +6,7 @@ interface MembersContextType {
   members: any[];
   removeMember: (userId: number) => void;
   addMember: (member: any) => void;
+  updateMemberRole: (userId: number, role: "member" | "manager") => void;
 }
 
 const MembersContext = createContext<MembersContextType | undefined>(undefined);
@@ -33,14 +34,20 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       level: member.level || 1,
       rank: members.length + 1,
       streak: member.streak || 0,
+      role: member.role || "member",
     };
     setMembers([...members, newMember]);
+  };
+
+  const updateMemberRole = (userId: number, role: "member" | "manager") => {
+    setMembers(members.map(m => m.id === userId ? { ...m, role } : m));
   };
 
   const value = {
     members,
     removeMember,
     addMember,
+    updateMemberRole,
   };
 
   return (
