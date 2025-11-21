@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { useMembers } from "@/lib/members-context";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
-// Mock: logged-in user is the first member (Alex)
-
 export default function Profile() {
+  const { members } = useMembers();
+  // Mock: logged-in user is the first member (Alex)
+  const CURRENT_USER = members[0] || { name: "Ranger", level: 1, xp: 0, rank: 0, streak: 0, title: "Adventurer", avatar: "" };
+  
   const nextLevelXp = CURRENT_USER.level * 1000;
   const currentLevelXp = (CURRENT_USER.level - 1) * 1000;
   const xpToNextLevel = nextLevelXp - CURRENT_USER.xp;
