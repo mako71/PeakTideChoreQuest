@@ -13,13 +13,13 @@ export default function Profile() {
   const { user } = useAuth();
   // Get current user's member profile
   const CURRENT_USER = members.find(m => m.userId === user?.id) || members[0] || { name: "Ranger", level: 1, xp: 0, streak: 0, title: "Adventurer", avatar: "" };
-  // Calculate rank based on XP
-  const rank = members.filter(m => m.xp > CURRENT_USER.xp).length + 1;
+  // Calculate rank based on XP - only when we have valid data
+  const rank = members.length > 0 && CURRENT_USER.xp !== undefined ? members.filter(m => m.xp > CURRENT_USER.xp).length + 1 : 1;
   
   const nextLevelXp = CURRENT_USER.level * 1000;
   const currentLevelXp = (CURRENT_USER.level - 1) * 1000;
-  const xpToNextLevel = nextLevelXp - CURRENT_USER.xp;
-  const levelProgress = ((CURRENT_USER.xp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100;
+  const xpToNextLevel = nextLevelXp - (CURRENT_USER.xp || 0);
+  const levelProgress = ((CURRENT_USER.xp || 0 - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
