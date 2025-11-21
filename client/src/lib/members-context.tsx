@@ -1,50 +1,95 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-import { USERS } from "./data";
-import { useQuests } from "./quests-context";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { useAuth } from "./auth-context";
 
 interface MembersContextType {
   members: any[];
-  removeMember: (userId: number) => void;
-  addMember: (member: any) => void;
-  updateMemberRole: (userId: number, role: "member" | "manager") => void;
+  loading: boolean;
+  removeMember: (id: number) => Promise<void>;
+  addMember: (member: any) => Promise<void>;
+  updateMemberRole: (id: number, role: "member" | "manager") => Promise<void>;
 }
 
 const MembersContext = createContext<MembersContextType | undefined>(undefined);
 
 export function MembersProvider({ children }: { children: ReactNode }) {
-  const [members, setMembers] = useState(USERS);
-  const { tasks, updateQuest } = useQuests();
+  const [members, setMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
-  const removeMember = (userId: number) => {
-    setMembers(members.filter(m => m.id !== userId));
-    
-    // Remove member assignments from all quests
-    tasks.forEach(task => {
-      if (task.assignee === userId) {
-        updateQuest({ ...task, assignee: null });
+  const fetchMembers = async () => {
+    if (!user?.householdId) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/households/${user.householdId}/members`);
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data);
       }
-    });
+    } catch (error) {
+      console.error("Failed to fetch members", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const addMember = (member: any) => {
-    const newMember = {
-      ...member,
-      id: Math.max(...members.map(m => m.id), 0) + 1,
-      xp: member.xp || 0,
-      level: member.level || 1,
-      rank: members.length + 1,
-      streak: member.streak || 0,
-      role: member.role || "member",
-    };
-    setMembers([...members, newMember]);
+  useEffect(() => {
+    fetchMembers();
+  }, [user?.householdId]);
+
+  const removeMember = async (id: number) => {
+    try {
+      const res = await fetch(`/api/members/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setMembers(members.filter(m => m.id !== id));
+      }
+    } catch (error) {
+      console.error("Failed to remove member", error);
+      throw error;
+    }
   };
 
-  const updateMemberRole = (userId: number, role: "member" | "manager") => {
-    setMembers(members.map(m => m.id === userId ? { ...m, role } : m));
+  const addMember = async (member: any) => {
+    if (!user?.householdId) return;
+
+    try {
+      const res = await fetch(`/api/households/${user.householdId}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(member),
+      });
+
+      if (res.ok) {
+        const newMember = await res.json();
+        setMembers([...members, newMember]);
+      }
+    } catch (error) {
+      console.error("Failed to add member", error);
+      throw error;
+    }
+  };
+
+  const updateMemberRole = async (id: number, role: "member" | "manager") => {
+    try {
+      const res = await fetch(`/api/members/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+
+      if (res.ok) {
+        const updatedMember = await res.json();
+        setMembers(members.map(m => m.id === id ? updatedMember : m));
+      }
+    } catch (error) {
+      console.error("Failed to update member role", error);
+      throw error;
+    }
   };
 
   const value = {
     members,
+    loading,
     removeMember,
     addMember,
     updateMemberRole,
