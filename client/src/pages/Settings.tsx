@@ -1,6 +1,7 @@
-import { useState } from "react";
 import { Navigation } from "@/components/layout/Navigation";
 import { USERS } from "@/lib/data";
+import { useAppSettings } from "@/lib/context";
+import { useToast } from "@/hooks/use-toast";
 import { Settings, Users, Bell, Palette, Shield, HelpCircle, LogOut } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,9 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
 export default function SettingsPage() {
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const { notifications, setNotifications, darkMode, setDarkMode, soundEnabled, setSoundEnabled, selectedTheme, setSelectedTheme } = useAppSettings();
+  const { toast } = useToast();
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
@@ -71,7 +71,25 @@ export default function SettingsPage() {
                       <p className="font-medium">Sound Effects</p>
                       <p className="text-sm text-muted-foreground">Play sounds for quest completion</p>
                     </div>
-                    <Switch checked={soundEnabled} onCheckedChange={setSoundEnabled} />
+                    <Switch 
+                      checked={soundEnabled} 
+                      onCheckedChange={(checked) => {
+                        setSoundEnabled(checked);
+                        if (soundEnabled) {
+                          // Play a notification sound effect
+                          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                          const oscillator = audioContext.createOscillator();
+                          const gain = audioContext.createGain();
+                          oscillator.connect(gain);
+                          gain.connect(audioContext.destination);
+                          oscillator.frequency.value = 800;
+                          gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                          gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                          oscillator.start(audioContext.currentTime);
+                          oscillator.stop(audioContext.currentTime + 0.1);
+                        }
+                      }} 
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -91,20 +109,43 @@ export default function SettingsPage() {
                       <p className="font-medium">Dark Mode</p>
                       <p className="text-sm text-muted-foreground">Easier on the eyes during night expeditions</p>
                     </div>
-                    <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+                    <Switch 
+                      checked={darkMode} 
+                      onCheckedChange={(checked) => {
+                        setDarkMode(checked);
+                        if (checked) {
+                          document.documentElement.classList.add("dark");
+                        } else {
+                          document.documentElement.classList.remove("dark");
+                        }
+                        toast({
+                          title: checked ? "Dark Mode Activated" : "Light Mode Activated",
+                          description: `Switched to ${checked ? "dark" : "light"} theme. Enjoy your expedition!`,
+                        });
+                      }} 
+                    />
                   </div>
 
                   <div className="space-y-3">
                     <Label className="text-sm font-medium">Color Theme</Label>
                     <div className="flex gap-3">
                       {[
-                        { name: "Forest", colors: "from-primary to-secondary" },
-                        { name: "Ocean", colors: "from-blue-500 to-cyan-500" },
-                        { name: "Sunset", colors: "from-orange-500 to-red-500" },
+                        { name: "Forest", id: "forest", colors: "from-primary to-secondary" },
+                        { name: "Ocean", id: "ocean", colors: "from-blue-500 to-cyan-500" },
+                        { name: "Sunset", id: "sunset", colors: "from-orange-500 to-red-500" },
                       ].map((theme) => (
                         <button
-                          key={theme.name}
-                          className={`w-12 h-12 rounded-lg bg-gradient-to-br ${theme.colors} cursor-pointer hover:ring-2 ring-offset-2 ring-foreground transition-all`}
+                          key={theme.id}
+                          onClick={() => {
+                            setSelectedTheme(theme.id);
+                            toast({
+                              title: `${theme.name} Theme Activated`,
+                              description: `Your household expedition now has the ${theme.name} aesthetic.`,
+                            });
+                          }}
+                          className={`w-12 h-12 rounded-lg bg-gradient-to-br ${theme.colors} cursor-pointer transition-all ${
+                            selectedTheme === theme.id ? "ring-2 ring-offset-2 ring-foreground scale-110" : "hover:ring-2 ring-offset-2 ring-foreground/30"
+                          }`}
                           title={theme.name}
                         />
                       ))}
@@ -132,11 +173,27 @@ export default function SettingsPage() {
                           <p className="text-xs text-muted-foreground">Level {user.level} • {user.xp} XP</p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">Remove</Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => toast({
+                          title: "Member removed",
+                          description: `${user.name} has been removed from the household.`,
+                        })}
+                      >
+                        Remove
+                      </Button>
                     </div>
                   ))}
                   
-                  <Button variant="outline" className="w-full mt-4">
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-4"
+                    onClick={() => toast({
+                      title: "Invite Link Generated",
+                      description: "Share this link with household members to invite them.",
+                    })}
+                  >
                     + Invite Member
                   </Button>
                 </CardContent>
@@ -168,7 +225,14 @@ export default function SettingsPage() {
                     <Switch defaultChecked />
                   </div>
 
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => toast({
+                      title: "Change Password",
+                      description: "Password change link has been sent to your email.",
+                    })}
+                  >
                     Change Password
                   </Button>
                 </CardContent>
@@ -208,16 +272,44 @@ export default function SettingsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-sm h-auto py-2"
+                    onClick={() => toast({
+                      title: "Tutorial",
+                      description: "Check out our Getting Started guide on the help docs.",
+                    })}
+                  >
                     📖 View Tutorial
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-sm h-auto py-2"
+                    onClick={() => toast({
+                      title: "Bug Reported",
+                      description: "Thanks! Our team will investigate this issue.",
+                    })}
+                  >
                     🐛 Report Bug
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-sm h-auto py-2"
+                    onClick={() => toast({
+                      title: "Feedback Sent",
+                      description: "We appreciate your suggestions for improvement!",
+                    })}
+                  >
                     💡 Send Feedback
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-sm h-auto py-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-sm h-auto py-2"
+                    onClick={() => toast({
+                      title: "FAQ",
+                      description: "Browse our frequently asked questions.",
+                    })}
+                  >
                     ❓ FAQ
                   </Button>
                 </CardContent>
@@ -229,10 +321,24 @@ export default function SettingsPage() {
                   <CardTitle className="text-base text-destructive">Danger Zone</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <Button variant="outline" className="w-full text-sm h-auto py-2 border-destructive/50 hover:bg-destructive/10">
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-sm h-auto py-2 border-destructive/50 hover:bg-destructive/10"
+                    onClick={() => toast({
+                      title: "Progress Reset",
+                      description: "Your household expedition progress has been reset. All quests and XP cleared.",
+                    })}
+                  >
                     Reset Progress
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-destructive text-sm h-auto py-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-destructive text-sm h-auto py-2"
+                    onClick={() => toast({
+                      title: "Logged Out",
+                      description: "See you next time, Ranger! 👋",
+                    })}
+                  >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </Button>
