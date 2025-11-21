@@ -1,7 +1,9 @@
 import { Navigation } from "@/components/layout/Navigation";
 import { InviteDialog } from "@/components/settings/InviteDialog";
+import { EditMemberDialog } from "@/components/settings/EditMemberDialog";
 import { useAppSettings } from "@/lib/context";
 import { useMembers } from "@/lib/members-context";
+import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { Settings, Users, Bell, Palette, Shield, HelpCircle, LogOut, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -14,6 +16,9 @@ import generatedMap from "@assets/generated_images/topographic_map_pattern_textu
 
 export default function SettingsPage() {
   const { members, removeMember, updateMemberRole } = useMembers();
+  const { user } = useAuth();
+  const currentUserMember = members.find(m => m.userId === user?.id);
+  const isManager = currentUserMember?.role === 'manager';
   const { notifications, setNotifications, darkMode, setDarkMode, soundEnabled, setSoundEnabled, selectedTheme, setSelectedTheme } = useAppSettings();
   const { toast } = useToast();
 
@@ -201,22 +206,31 @@ export default function SettingsPage() {
                         </div>
                       </div>
                       <div className="flex gap-2 w-full md:w-auto">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="text-xs flex-1 md:flex-none"
-                          onClick={() => handleToggleRole(user.id, user.role)}
-                        >
-                          {user.role === 'manager' ? 'Demote' : 'Promote'}
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="text-xs hover:bg-destructive/10 hover:text-destructive flex-1 md:flex-none"
-                          onClick={() => handleRemoveMember(user.id, user.name)}
-                        >
-                          Remove
-                        </Button>
+                        {isManager && (
+                          <EditMemberDialog member={user} />
+                        )}
+                        {isManager && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-xs flex-1 md:flex-none"
+                            onClick={() => handleToggleRole(user.id, user.role)}
+                            data-testid={`button-toggle-role-${user.id}`}
+                          >
+                            {user.role === 'manager' ? 'Demote' : 'Promote'}
+                          </Button>
+                        )}
+                        {isManager && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="text-xs hover:bg-destructive/10 hover:text-destructive flex-1 md:flex-none"
+                            onClick={() => handleRemoveMember(user.id, user.name)}
+                            data-testid={`button-remove-member-${user.id}`}
+                          >
+                            Remove
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ))}

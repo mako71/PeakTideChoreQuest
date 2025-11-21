@@ -7,6 +7,7 @@ interface MembersContextType {
   removeMember: (id: number) => Promise<void>;
   addMember: (member: any) => Promise<void>;
   updateMemberRole: (id: number, role: "member" | "manager") => Promise<void>;
+  updateMember: (id: number, updates: any) => Promise<void>;
 }
 
 const MembersContext = createContext<MembersContextType | undefined>(undefined);
@@ -87,12 +88,31 @@ export function MembersProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateMember = async (id: number, updates: any) => {
+    try {
+      const res = await fetch(`/api/members/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+
+      if (res.ok) {
+        const updatedMember = await res.json();
+        setMembers(members.map(m => m.id === id ? updatedMember : m));
+      }
+    } catch (error) {
+      console.error("Failed to update member", error);
+      throw error;
+    }
+  };
+
   const value = {
     members,
     loading,
     removeMember,
     addMember,
     updateMemberRole,
+    updateMember,
   };
 
   return (
