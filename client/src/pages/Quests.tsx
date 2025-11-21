@@ -2,22 +2,22 @@ import { useState } from "react";
 import { Navigation } from "@/components/layout/Navigation";
 import { AddQuestDialog } from "@/components/settings/AddQuestDialog";
 import { TaskCard } from "@/components/dashboard/TaskCard";
-import { TASKS } from "@/lib/data";
 import { Plus, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { useQuests } from "@/lib/quests-context";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
 const QUEST_TYPES = ["All", "Land", "Sea"];
 const QUEST_DIFFICULTY = ["Any", "Easy", "Medium", "Hard", "Extreme"];
 
 export default function Quests() {
-  const [tasks, setTasks] = useState(TASKS);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All");
   const [difficultyFilter, setDifficultyFilter] = useState("Any");
+  const { tasks, completeQuest, claimQuest, addQuest, updateQuest, deleteQuest } = useQuests();
 
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase());
@@ -33,23 +33,23 @@ export default function Quests() {
   });
 
   const handleComplete = (id: number) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, status: 'completed' } : t));
+    completeQuest(id);
   };
 
   const handleClaim = (id: number) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, assignee: 1 } : t));
+    claimQuest(id);
   };
 
   const handleAddQuest = (newQuest: any) => {
-    setTasks([...tasks, newQuest]);
+    addQuest(newQuest);
   };
 
   const handleEditQuest = (updatedQuest: any) => {
-    setTasks(tasks.map(t => t.id === updatedQuest.id ? updatedQuest : t));
+    updateQuest(updatedQuest);
   };
 
   const handleDeleteQuest = (id: number) => {
-    setTasks(tasks.filter(t => t.id !== id));
+    deleteQuest(id);
   };
 
   return (

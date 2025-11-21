@@ -3,24 +3,24 @@ import { Navigation } from "@/components/layout/Navigation";
 import { AddQuestDialog } from "@/components/settings/AddQuestDialog";
 import { Leaderboard } from "@/components/dashboard/Leaderboard";
 import { TaskCard } from "@/components/dashboard/TaskCard";
-import { TASKS } from "@/lib/data";
 import { motion } from "framer-motion";
 import { Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuests } from "@/lib/quests-context";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 import heroImage from "@assets/generated_images/adventure_enthusiasts_hero_image.png";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const [filter, setFilter] = useState<'all' | 'mountain' | 'ocean'>('all');
-  const [tasks, setTasks] = useState(TASKS);
+  const { tasks, completeQuest, claimQuest, addQuest, updateQuest, deleteQuest } = useQuests();
   const { toast } = useToast();
 
   const filteredTasks = tasks.filter(t => filter === 'all' || t.type === filter);
 
   const handleComplete = (id: number) => {
     const task = tasks.find(t => t.id === id);
-    setTasks(tasks.map(t => t.id === id ? { ...t, status: 'completed' } : t));
+    completeQuest(id);
     if (task) {
       toast({
         title: "Mission Complete! 🎉",
@@ -31,9 +31,8 @@ export default function Dashboard() {
   };
 
   const handleClaim = (id: number) => {
-     // Mock claim functionality
      const task = tasks.find(t => t.id === id);
-     setTasks(tasks.map(t => t.id === id ? { ...t, assignee: 1 } : t));
+     claimQuest(id);
      if (task) {
       toast({
         title: "Quest Accepted ⚔️",
@@ -43,15 +42,15 @@ export default function Dashboard() {
   };
 
   const handleAddQuest = (newQuest: any) => {
-    setTasks([...tasks, newQuest]);
+    addQuest(newQuest);
   };
 
   const handleEditQuest = (updatedQuest: any) => {
-    setTasks(tasks.map(t => t.id === updatedQuest.id ? updatedQuest : t));
+    updateQuest(updatedQuest);
   };
 
   const handleDeleteQuest = (id: number) => {
-    setTasks(tasks.filter(t => t.id !== id));
+    deleteQuest(id);
   };
 
   return (
