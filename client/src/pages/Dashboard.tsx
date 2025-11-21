@@ -21,6 +21,13 @@ export default function Dashboard() {
   const currentUser = members[0] || { name: "Ranger", title: "Adventurer" };
   const { toast } = useToast();
 
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good Morning";
+    if (hour >= 12 && hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   const filteredTasks = tasks.filter(t => filter === 'all' || t.type === filter);
 
   const handleComplete = (id: number) => {
@@ -84,7 +91,7 @@ export default function Dashboard() {
                 Daily Briefing
               </div>
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                Morning, {currentUser.name}.
+                {getTimeBasedGreeting()}, {currentUser.name}.
               </h2>
               <p className="text-sidebar-foreground/80 leading-relaxed">
                 The dish mountain is growing, but the laundry seas are calm. 
