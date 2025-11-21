@@ -32,7 +32,7 @@ export function QuestsProvider({ children }: { children: ReactNode }) {
   };
 
   const claimQuest = (id: number) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, assignee: 1 } : t));
+    setTasks(tasks.map(t => t.id === id ? { ...t, assignee: 1, status: 'in-progress' } : t));
   };
 
   const value = {
