@@ -9,6 +9,7 @@ import { Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuests } from "@/lib/quests-context";
 import { useMembers } from "@/lib/members-context";
+import { useAuth } from "@/lib/auth-context";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 import heroImage from "@assets/generated_images/adventure_enthusiasts_hero_image.png";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [showBoard, setShowBoard] = useState(true);
   const { tasks, completeQuest, claimQuest, addQuest, updateQuest, deleteQuest } = useQuests();
   const { members } = useMembers();
+  const { user } = useAuth();
   const currentUser = members[0] || { name: "Ranger", title: "Adventurer" };
   const { toast } = useToast();
 
@@ -91,7 +93,7 @@ export default function Dashboard() {
                 Daily Briefing
               </div>
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                {getTimeBasedGreeting()}, {currentUser.name}.
+                {getTimeBasedGreeting()}, {user?.username || currentUser.name}.
               </h2>
               <p className="text-sidebar-foreground/80 leading-relaxed">
                 The dish mountain is growing, but the laundry seas are calm. 
