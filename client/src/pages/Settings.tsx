@@ -1,4 +1,5 @@
 import { Navigation } from "@/components/layout/Navigation";
+import { InviteDialog } from "@/components/settings/InviteDialog";
 import { USERS } from "@/lib/data";
 import { useAppSettings } from "@/lib/context";
 import { useToast } from "@/hooks/use-toast";
@@ -186,16 +187,7 @@ export default function SettingsPage() {
                     </div>
                   ))}
                   
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-4"
-                    onClick={() => toast({
-                      title: "Invite Link Generated",
-                      description: "Share this link with household members to invite them.",
-                    })}
-                  >
-                    + Invite Member
-                  </Button>
+                  <InviteDialog />
                 </CardContent>
               </Card>
 
