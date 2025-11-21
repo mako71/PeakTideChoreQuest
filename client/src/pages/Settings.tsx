@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { Navigation } from "@/components/layout/Navigation";
 import { InviteDialog } from "@/components/settings/InviteDialog";
-import { USERS } from "@/lib/data";
 import { useAppSettings } from "@/lib/context";
+import { useMembers } from "@/lib/members-context";
 import { useToast } from "@/hooks/use-toast";
 import { Settings, Users, Bell, Palette, Shield, HelpCircle, LogOut } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -14,12 +13,12 @@ import { Separator } from "@/components/ui/separator";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
 export default function SettingsPage() {
-  const [householdMembers, setHouseholdMembers] = useState(USERS);
+  const { members, removeMember } = useMembers();
   const { notifications, setNotifications, darkMode, setDarkMode, soundEnabled, setSoundEnabled, selectedTheme, setSelectedTheme } = useAppSettings();
   const { toast } = useToast();
 
   const handleRemoveMember = (userId: number, userName: string) => {
-    setHouseholdMembers(householdMembers.filter(user => user.id !== userId));
+    removeMember(userId);
     toast({
       title: "Member Removed",
       description: `${userName} has been removed from the household.`,
@@ -176,7 +175,7 @@ export default function SettingsPage() {
                   <CardDescription>Manage your expedition crew</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {householdMembers.map((user) => (
+                  {members.map((user) => (
                     <div key={user.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg animate-in fade-in slide-in-from-right-2">
                       <div className="flex items-center gap-3">
                         <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
@@ -250,7 +249,7 @@ export default function SettingsPage() {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Members</span>
-                    <span className="font-bold">{householdMembers.length}</span>
+                    <span className="font-bold">{members.length}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-sm">

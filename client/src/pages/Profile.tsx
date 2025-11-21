@@ -1,12 +1,13 @@
 import { Navigation } from "@/components/layout/Navigation";
-import { USERS, ACHIEVEMENTS } from "@/lib/data";
+import { ACHIEVEMENTS } from "@/lib/data";
 import { Trophy, Flame, Star, Target, TrendingUp, Award } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { useMembers } from "@/lib/members-context";
 import generatedMap from "@assets/generated_images/topographic_map_pattern_texture.png";
 
-const CURRENT_USER = USERS[0]; // Mock: logged-in user is Alex
+// Mock: logged-in user is the first member (Alex)
 
 export default function Profile() {
   const nextLevelXp = CURRENT_USER.level * 1000;

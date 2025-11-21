@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/lib/context";
 import { QuestsProvider } from "@/lib/quests-context";
+import { MembersProvider } from "@/lib/members-context";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import Quests from "@/pages/Quests";
@@ -27,12 +28,14 @@ function App() {
   return (
     <AppProvider>
       <QuestsProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </QueryClientProvider>
+        <MembersProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </MembersProvider>
       </QuestsProvider>
     </AppProvider>
   );

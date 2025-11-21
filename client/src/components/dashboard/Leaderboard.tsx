@@ -1,10 +1,11 @@
-import { USERS } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Medal, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMembers } from "@/lib/members-context";
 
 export function Leaderboard() {
-  const sortedUsers = [...USERS].sort((a, b) => b.xp - a.xp);
+  const { members } = useMembers();
+  const sortedUsers = [...members].sort((a, b) => b.xp - a.xp);
 
   return (
     <Card className="border-none shadow-none bg-transparent">
