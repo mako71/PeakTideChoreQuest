@@ -1,20 +1,23 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, Mountain, Waves, ChevronDown, ChevronUp, User, Zap } from "lucide-react";
+import { CheckCircle2, Circle, Mountain, Waves, ChevronDown, ChevronUp, User, Zap, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { EditQuestDialog } from "@/components/settings/EditQuestDialog";
 import { USERS } from "@/lib/data";
 
 interface TaskCardProps {
   task: any;
   onComplete?: (id: number) => void;
   onClaim?: (id: number) => void;
+  onEdit?: (updatedQuest: any) => void;
+  onDelete?: (id: number) => void;
 }
 
-export function TaskCard({ task, onComplete, onClaim }: TaskCardProps) {
+export function TaskCard({ task, onComplete, onClaim, onEdit, onDelete }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
@@ -71,11 +74,25 @@ export function TaskCard({ task, onComplete, onClaim }: TaskCardProps) {
                 {difficultyIcons}
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
                <span className="text-sm font-bold text-accent flex items-center gap-1 font-tech">
                  <Zap className="w-3 h-3 fill-current" />
                  {task.xp} XP
                </span>
+               {task.status !== 'completed' && (
+                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                   {onEdit && <EditQuestDialog quest={task} onSaveQuest={onEdit} />}
+                   {onDelete && (
+                     <button
+                       onClick={() => onDelete(task.id)}
+                       className="hover:text-destructive transition-colors"
+                       title="Delete quest"
+                     >
+                       <Trash2 className="w-4 h-4" />
+                     </button>
+                   )}
+                 </div>
+               )}
             </div>
           </div>
           <div className="flex justify-between items-center">

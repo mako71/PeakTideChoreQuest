@@ -44,6 +44,14 @@ export default function Quests() {
     setTasks([...tasks, newQuest]);
   };
 
+  const handleEditQuest = (updatedQuest: any) => {
+    setTasks(tasks.map(t => t.id === updatedQuest.id ? updatedQuest : t));
+  };
+
+  const handleDeleteQuest = (id: number) => {
+    setTasks(tasks.filter(t => t.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       <Navigation />
@@ -168,6 +176,8 @@ export default function Quests() {
                     task={task} 
                     onComplete={handleComplete}
                     onClaim={handleClaim}
+                    onEdit={handleEditQuest}
+                    onDelete={handleDeleteQuest}
                   />
                 ))}
               </div>
