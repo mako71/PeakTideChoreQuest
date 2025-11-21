@@ -187,24 +187,24 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {members.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg animate-in fade-in slide-in-from-right-2">
-                      <div className="flex items-center gap-3 flex-1">
-                        <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{user.name}</p>
-                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${user.role === 'manager' ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'}`}>
+                    <div key={user.id} className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 bg-muted/30 rounded-lg animate-in fade-in slide-in-from-right-2">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <img src={user.avatar} alt={user.name} className="w-10 h-10 flex-shrink-0 rounded-full object-cover" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-medium truncate">{user.name}</p>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${user.role === 'manager' ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'}`}>
                               {user.role === 'manager' ? '👑 Manager' : 'Member'}
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground">Level {user.level} • {user.xp} XP</p>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 w-full md:w-auto">
                         <Button 
                           variant="outline" 
                           size="sm"
-                          className="text-xs"
+                          className="text-xs flex-1 md:flex-none"
                           onClick={() => handleToggleRole(user.id, user.role)}
                         >
                           {user.role === 'manager' ? 'Demote' : 'Promote'}
@@ -212,7 +212,7 @@ export default function SettingsPage() {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          className="hover:bg-destructive/10 hover:text-destructive"
+                          className="text-xs hover:bg-destructive/10 hover:text-destructive flex-1 md:flex-none"
                           onClick={() => handleRemoveMember(user.id, user.name)}
                         >
                           Remove
