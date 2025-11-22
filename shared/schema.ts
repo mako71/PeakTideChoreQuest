@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, serial, integer, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, json, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -44,6 +44,19 @@ export const quests = pgTable("quests", {
   status: text("status").notNull().default("open"), // 'open', 'in-progress', 'completed'
   assigneeId: integer("assignee_id"),
   steps: json("steps").default([]), // array of step strings
+  dueDate: timestamp("due_date"),
+});
+
+// Notifications for falling-behind quests
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  householdId: varchar("household_id").notNull(),
+  questId: integer("quest_id").notNull(),
+  memberId: integer("member_id"),
+  type: text("type").notNull().default("falling_behind"), // 'falling_behind', 'overdue'
+  message: text("message").notNull(),
+  read: boolean("read").default(false),
+  createdAt: timestamp("created_at").default(sql`now()`),
 });
 
 // Schemas for validation
